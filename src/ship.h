@@ -33,7 +33,9 @@ public:
 	// getters
 	float getMaxSpeed() const;
 	int getHealth() const;
+
 	DisplayObject* getTarget();
+
 	std::vector<DisplayObject*>& getPatrol();
 	DecisionTree* getTree();
 	DisplayObject* getCurrentWaypoint();

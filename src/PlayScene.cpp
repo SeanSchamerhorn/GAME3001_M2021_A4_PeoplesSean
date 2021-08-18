@@ -118,6 +118,7 @@ void PlayScene::start()
 	m_pShip->getPatrol().push_back(m_pGrid[104]);
 	m_pShip->setTarget(m_pShip->getPatrol().front());
 
+
 	//// add the Obstacle to the scene as a start point
 	//m_pObstacle1 = new Obstacle();
 	//m_pObstacle1->getTransform()->position = glm::vec2(380.f, 280.f);
@@ -150,9 +151,10 @@ void PlayScene::start()
 	addChild(m_pTarget);
 
 	// Set some data onto the ship's decision tree's map. I only have the player/target for now.
+	m_pShip->getTree()->setPlayer(m_pTarget);
 	m_pShip->getTree()->getMap().emplace("target", m_pTarget);
 	m_pShip->getTree()->MakeDecision(); // Or we won't go into patrol
-
+	
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
 

@@ -53,7 +53,7 @@ m_currentAnimationState(ENEMY_IDLE_DOWN)
 	m_pTree = new DecisionTree(this); // this is a pointer to the Ship object
 	// m_pTree->setAgent(this);
 	//m_pTree->Display(); // Optional.
-	m_patrol.reserve(4);
+	m_patrol.reserve(m_patrol.size());
 
 }
 

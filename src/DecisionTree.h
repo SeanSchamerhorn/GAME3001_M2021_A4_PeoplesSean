@@ -8,8 +8,6 @@
 #include "TreeNode.h"
 #include "TreeNodeType.h"
 #include <map>
-
-
 #include "Blink.h"
 #include "EnemyBullet.h"
 
@@ -22,12 +20,17 @@ public:
 
 	// getters and setters
 	Agent* getAgent() const;
+
+	Blink* getPlayer()const;
+	
 	LOSCondition* getLOSNode() const;
 	RadiusCondition* getRadiusNode() const;
 	CloseCombatCondition* getCloseCombatNode() const;
-	void setAgent(Agent* agent);
-	std::map<std::string, DisplayObject*>& getMap();
 
+	void setAgent(Agent* agent);
+	void setPlayer(Blink* player);
+	
+	std::map<std::string, DisplayObject*>& getMap();
 	
 
 	// convenience functions
@@ -40,7 +43,9 @@ public:
 	
 private:
 	Agent* m_agent;
-	
+
+	Blink* m_player;
+
 	LOSCondition* m_LOSNode;
 	RadiusCondition* m_RadiusNode;
 	CloseCombatCondition* m_CloseCombatNode;

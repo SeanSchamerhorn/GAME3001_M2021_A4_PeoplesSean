@@ -19,6 +19,15 @@ Agent* DecisionTree::getAgent() const
 	return m_agent;
 }
 
+Blink* DecisionTree::getPlayer() const
+{
+	return m_player;
+}
+
+void DecisionTree::setPlayer(Blink* player)
+{
+	m_player = player;
+}
 
 LOSCondition* DecisionTree::getLOSNode() const
 {
@@ -39,8 +48,6 @@ void DecisionTree::setAgent(Agent* agent)
 {
 	m_agent = agent;
 }
-
-
 
 std::map<std::string, DisplayObject*>& DecisionTree::getMap()
 {
@@ -132,5 +139,6 @@ void DecisionTree::m_buildTree()
 	// This is incomplete for you to fill in for assignment.
 	TreeNode* attackNode = AddNode(m_CloseCombatNode, new AttackAction(), RIGHT_TREE_NODE);
 	static_cast<ActionNode*>(attackNode)->SetShip(static_cast<Ship*>(m_agent));
+	static_cast<ActionNode*>(attackNode)->SetPlayer(static_cast<Blink*>(m_player));
 	m_treeNodeList.push_back(attackNode);
 }
