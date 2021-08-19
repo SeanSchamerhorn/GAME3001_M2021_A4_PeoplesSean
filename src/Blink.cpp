@@ -1,6 +1,8 @@
 #include "Blink.h"
 
 #include "EventManager.h"
+#include "Game.h"
+#include "SoundManager.h"
 #include "TextureManager.h"
 #include "Util.h"
 
@@ -95,16 +97,24 @@ void Blink::draw()
 
 void Blink::update()
 {
+	bool is_playing = false;
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_W))
 	{
-		moveForward();
+		if (Game::Instance().getFrames() % 17 == 0)
+		{
+			SoundManager::Instance().playSound("footsteps", 0);
+			is_playing = true;
+		}
+			moveForward();
 	}
 	if(EventManager::Instance().isKeyDown(SDL_SCANCODE_A))
 	{
+		setAnimationState(BLINK_RUN_LEFT);
 		turnLeft();
 	}
 	if(EventManager::Instance().isKeyDown(SDL_SCANCODE_D))
 	{
+		setAnimationState(BLINK_RUN_RIGHT);
 		turnRight();
 	}
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_S))

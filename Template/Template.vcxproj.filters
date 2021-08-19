@@ -228,6 +228,9 @@
     <ClCompile Include="..\src\Blink.cpp">
       <Filter>Game Objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\RangedCombatCondition.cpp">
+      <Filter>Decision\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\StartScene.h">
@@ -469,6 +472,9 @@
     </ClInclude>
     <ClInclude Include="..\src\BlinkAnimationState.h">
       <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RangedCombatCondition.h">
+      <Filter>Decision\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

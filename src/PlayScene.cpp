@@ -55,8 +55,8 @@ void PlayScene::update()
 	// Color the patrol nodes...
 	m_pGrid[81]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	m_pGrid[88]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	m_pGrid[208]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	m_pGrid[104]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	//m_pGrid[208]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	//m_pGrid[104]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	//if (m_pShip->hasLOS())
 	//{
@@ -88,6 +88,7 @@ void PlayScene::handleEvents()
 		EnemyBullet* will = new EnemyBullet();
 		will->getTransform()->position = m_pTarget->getTransform()->position;
 		will->setCurrentDirection(m_pTarget->getCurrentDirection());
+		SoundManager::Instance().playSound("flame", 0);
 		addChild(will);
 		m_pEbullets.push_back(will);
 	}
@@ -98,7 +99,16 @@ void PlayScene::start()
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
 
-	
+	// Load in sound files
+	SoundManager::Instance().allocateChannels(128);
+	SoundManager::Instance().load("../Assets/audio/walking.wav", "footsteps", SOUND_SFX);
+	SoundManager::Instance().setSoundVolume(20);
+	SoundManager::Instance().load("../Assets/audio/flamethrower.ogg", "flame", SOUND_SFX);
+	SoundManager::Instance().load("../Assets/audio/enemy_strike.ogg", "strike", SOUND_SFX);
+
+	SoundManager::Instance().load("../Assets/audio/forest_main.ogg", "forest", SOUND_MUSIC);
+	SoundManager::Instance().setMusicVolume(35);
+	SoundManager::Instance().playMusic("forest");
 	TextureManager::Instance().load("../Assets/textures/Forest_Tile_Map.png", "background");
 	auto size = TextureManager::Instance().getTextureSize("background");
 	setWidth(size.x);
@@ -108,14 +118,14 @@ void PlayScene::start()
 
 	// add the enemy to the scene as a start point
 	m_pShip = new Ship();
-	m_pShip->getTransform()->position = m_pGrid[61]->getTransform()->position;
+	m_pShip->getTransform()->position = m_pGrid[81]->getTransform()->position;
 	addChild(m_pShip, 3);
 
 	// Set the ship's patrol route.
 	m_pShip->getPatrol().push_back(m_pGrid[81]);
 	m_pShip->getPatrol().push_back(m_pGrid[88]);
-	m_pShip->getPatrol().push_back(m_pGrid[208]);
-	m_pShip->getPatrol().push_back(m_pGrid[104]);
+	//m_pShip->getPatrol().push_back(m_pGrid[208]);
+	//m_pShip->getPatrol().push_back(m_pGrid[104]);
 	m_pShip->setTarget(m_pShip->getPatrol().front());
 
 

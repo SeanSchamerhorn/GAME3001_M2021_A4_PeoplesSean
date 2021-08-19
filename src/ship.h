@@ -27,6 +27,7 @@ public:
 	void moveBack();
 
 	void move();
+	void wait();
 	void rotate();
 	void rotateToTarget(DisplayObject* target);
 
@@ -78,6 +79,7 @@ private:
 
 	int m_ctr = 0;
 };
+
 
 
 #endif /* defined (__SHIP__) */

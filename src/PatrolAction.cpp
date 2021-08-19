@@ -22,7 +22,17 @@ void PatrolAction::Action()
 	if (Util::distance(m_pShip->getTransform()->position, m_pTarget->getTransform()->position) <= 10.0f)
 	{
 		m_pTarget = m_pShip->getNextWaypoint();
+		/*if (Game::Instance().getFrames()%60 == 0)
+		{
+			m_pShip->wait();
+			m_pTarget = m_pShip->getNextWaypoint();
+		}
+		else
+		{
+			m_pShip->setMaxSpeed(1.0f);
+			m_pTarget = m_pShip->getNextWaypoint();
+			m_pShip->resumePatrol();
+		}*/
 	}
-	
 	m_pShip->move();
 }

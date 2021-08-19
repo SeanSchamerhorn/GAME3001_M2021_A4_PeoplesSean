@@ -1,4 +1,6 @@
 #include "ship.h"
+
+#include "Game.h"
 #include "glm/gtx/string_cast.hpp"
 #include "PlayScene.h"
 #include "TextureManager.h"
@@ -165,6 +167,12 @@ void Ship::move()
 	getRigidBody()->velocity *= 0.9f;*/
 }
 
+void Ship::wait()
+{
+	setAnimationState(ENEMY_IDLE_DOWN);
+	
+}
+
 void Ship::rotate()
 {
 	// Step 1: Find angle between two points
@@ -300,7 +308,7 @@ void Ship::m_buildAnimations()
 DisplayObject* Ship::getNextWaypoint()
 {
 	m_waypoint++;
-	if (m_waypoint == 4) m_waypoint = 0;
+	if (m_waypoint == m_patrol.size()) m_waypoint = 0;
 	setTarget(m_patrol[m_waypoint]);
 	return m_pTarget;
 }
