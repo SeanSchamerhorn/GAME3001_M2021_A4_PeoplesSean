@@ -16,8 +16,7 @@ AttackAction::~AttackAction()
 
 void AttackAction::Action()
 {
-	std::cout << "Performing Attack Action" << std::endl;
-	if (m_pEnemy->getTree()->getPlayer()->getHealth() != 0 && Game::Instance().getFrames() % 60 == 0)
+	if (/*m_pEnemy->getTree()->getPlayer()->getHealth() != 0 && */Game::Instance().getFrames() % 60 == 0)
 	{
 		m_pEnemy->getTree()->getPlayer()->setHealth(m_pEnemy->getTree()->getPlayer()->getHealth() - 10);
 	}
@@ -28,6 +27,7 @@ void AttackAction::Action()
 	}
 	if (Game::Instance().getFrames() % 32 == 0)
 		SoundManager::Instance().playSound("strike", 0);
+
 	if (m_pEnemy->getTree()->getPlayer()->getTransform()->position.x >= m_pEnemy->getTransform()->position.x)
 		std::cout << "ATTACK RIGHT" << std::endl;
 	m_pEnemy->setAnimationState(ENEMY_ATTACK_UP);

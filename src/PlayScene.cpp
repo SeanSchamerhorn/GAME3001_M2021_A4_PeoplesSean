@@ -31,6 +31,7 @@ void PlayScene::draw()
 
 void PlayScene::update()
 {
+	
 	m_mousePosition = EventManager::Instance().getMousePosition();
 	float angle_to_target;
 	angle_to_target = Util::angle(m_pPlayer->getTransform()->position, m_mousePosition);
@@ -42,7 +43,7 @@ void PlayScene::update()
 		Util::distance(m_pEnemy->getTransform()->position, m_pPlayer->getTransform()->position) <= m_pEnemy->getDetectionDistance());
 
 	m_pEnemy->getTree()->getCloseCombatNode()->setIsWithinCombatRange(
-		Util::distance(m_pEnemy->getTransform()->position, m_pPlayer->getTransform()->position) <= 60.0f);
+		Util::distance(m_pEnemy->getTransform()->position, m_pPlayer->getTransform()->position) <= 50.0f);
 
 	updateDisplayList();
 	
@@ -57,24 +58,13 @@ void PlayScene::update()
 	{
 		m_pEnemy->setCurrentHeading(m_pEnemy->getCurrentHeading() + 4.0f);
 	}
-
+	if (m_pPlayer->getHealth() < 0) { Game::Instance().changeSceneState(END_SCENE); }
 	// Color the patrol nodes...
 	m_pGrid[81]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	m_pGrid[88]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	//m_pGrid[208]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	//m_pGrid[104]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-
-	//m_pPlayer->setCurrentHeading(angle_to_target);
 	
-	//if (m_pEnemy->hasLOS())
-	//{
-	//	EnemyBullet* bill = new EnemyBullet();
-	//	bill->getTransform()->position = m_pEnemy->getTransform()->position;
-	//	bill->setCurrentDirection(m_pEnemy->getCurrentDirection());
-	//	addChild(bill);
-	//	m_pEbullets.push_back(bill);
-	//}
-	//
 }
 
 void PlayScene::clean()

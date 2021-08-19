@@ -19,7 +19,7 @@ void PatrolAction::Action()
 		m_pTarget = m_pEnemy->getCurrentWaypoint();
 		m_pEnemy->resumePatrol(); // Also sets state to PATROL
 	}
-	if (Util::distance(m_pEnemy->getTransform()->position, m_pTarget->getTransform()->position) <= 10.0f && Game::Instance().getFrames() % 300 == 0)
+	if (Util::distance(m_pEnemy->getTransform()->position, m_pTarget->getTransform()->position) <= 10.0f)
 	{
 		m_pTarget = m_pEnemy->getNextWaypoint();
 		
