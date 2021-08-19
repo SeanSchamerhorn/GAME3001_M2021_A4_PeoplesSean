@@ -7,7 +7,7 @@
 
 DecisionTree::DecisionTree(Agent* agent) 
 {
-	m_agent = agent; // Ship is upcasted to 'Agent'
+	m_agent = agent; // Enemy is upcasted to 'Agent'
 	m_buildTree();
 }
 
@@ -101,8 +101,7 @@ void DecisionTree::clean()
 // in-order traversal
 void DecisionTree::MakeDecision()  // Does not need to run every frame
 {
-	// Only sets the currentNode(current action)
-	std::cout << "In MakeDecision..." << std::endl;
+	// sets the currentNode(current action)
 	currentNode = m_treeNodeList[0]; // Start at root node.
 	while (!currentNode->isLeaf)
 	{
@@ -125,20 +124,20 @@ void DecisionTree::m_buildTree()
 	m_treeNodeList.push_back(m_CloseCombatNode);
 
 	TreeNode* patrolNode = AddNode(m_RadiusNode, new PatrolAction(), LEFT_TREE_NODE);
-	static_cast<ActionNode*>(patrolNode)->SetShip(static_cast<Ship*>(m_agent));
+	static_cast<ActionNode*>(patrolNode)->SetShip(static_cast<Enemy*>(m_agent));
 	m_treeNodeList.push_back(patrolNode);
 
 	TreeNode* moveToLOSNode = AddNode(m_RadiusNode, new MoveToLOSAction(), RIGHT_TREE_NODE);
-	static_cast<ActionNode*>(moveToLOSNode)->SetShip(static_cast<Ship*>(m_agent));
+	static_cast<ActionNode*>(moveToLOSNode)->SetShip(static_cast<Enemy*>(m_agent));
 	m_treeNodeList.push_back(moveToLOSNode);
 
 	TreeNode* moveToPlayerNode = AddNode(m_CloseCombatNode, new MoveToPlayerAction(), LEFT_TREE_NODE);
-	static_cast<ActionNode*>(moveToPlayerNode)->SetShip(static_cast<Ship*>(m_agent));
+	static_cast<ActionNode*>(moveToPlayerNode)->SetShip(static_cast<Enemy*>(m_agent));
 	m_treeNodeList.push_back(moveToPlayerNode);
 
-	// This is incomplete for you to fill in for assignment.
+	// This is incomplete 
 	TreeNode* attackNode = AddNode(m_CloseCombatNode, new AttackAction(), RIGHT_TREE_NODE);
-	static_cast<ActionNode*>(attackNode)->SetShip(static_cast<Ship*>(m_agent));
+	static_cast<ActionNode*>(attackNode)->SetShip(static_cast<Enemy*>(m_agent));
 	static_cast<ActionNode*>(attackNode)->SetPlayer(static_cast<Blink*>(m_player));
 	m_treeNodeList.push_back(attackNode);
 }

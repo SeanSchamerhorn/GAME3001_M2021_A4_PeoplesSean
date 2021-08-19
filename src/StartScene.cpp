@@ -55,7 +55,7 @@ void StartScene::start()
 	addChild(m_pInstructionsLabel);
 
 
-	m_pShip = new Ship();
+	m_pShip = new Enemy();
 	m_pShip->getTransform()->position = glm::vec2(400.0f, 300.0f); 
 	addChild(m_pShip); 
 

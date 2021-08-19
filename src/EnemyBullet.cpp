@@ -1,5 +1,7 @@
 #include "EnemyBullet.h"
 
+
+#include "EventManager.h"
 #include "TextureManager.h"
 
 EnemyBullet::EnemyBullet():m_currentAnimationState(BULLET_UP),m_maxSpeed(10.0f)
@@ -24,6 +26,8 @@ EnemyBullet::EnemyBullet():m_currentAnimationState(BULLET_UP),m_maxSpeed(10.0f)
 	setType(ENEMY_BULLET);
 
 	m_buildAnimations();
+	setCurrentHeading(0.0f);
+	setCurrentDirection(glm::vec2(-1.0f,0.0f));
 }
 
 EnemyBullet::~EnemyBullet()

@@ -1,4 +1,4 @@
-#include "ship.h"
+#include "Enemy.h"
 
 #include "Game.h"
 #include "glm/gtx/string_cast.hpp"
@@ -6,16 +6,9 @@
 #include "TextureManager.h"
 #include "Util.h"
 
-Ship::Ship() : m_maxSpeed(1.0f), m_waypoint(0), m_pTarget(nullptr), m_state(ActionState::NO_STATE), m_ctr(0),
+Enemy::Enemy() : m_maxSpeed(1.0f), m_waypoint(0), m_pTarget(nullptr), m_state(ActionState::NO_STATE), m_ctr(0),
 m_currentAnimationState(ENEMY_IDLE_DOWN)
 {
-	//TextureManager::Instance().load("../Assets/textures/Blue-Soldier.png", "ship");
-
-	//auto size = TextureManager::Instance().getTextureSize("ship");
-	//setWidth(size.x);
-	//setHeight(size.y);
-
-
 	TextureManager::Instance().loadSpriteSheet(
 		"../Assets/sprites/atlas.txt",
 		"../Assets/sprites/BlueLinkAtlas.png",
@@ -43,8 +36,12 @@ m_currentAnimationState(ENEMY_IDLE_DOWN)
 
 	m_health = 40;
 
+	// Collision
+	setCOLDistance(60.0f);
+	setCOLColour(glm::vec4(1, 0, 0, 1));
+
 	// LOS
-	setLOSDistance(400.0f); // 5 ppf x 80 feet
+	setLOSDistance(200.0f); // 5 ppf x 80 feet
 	setLOSColour(glm::vec4(1, 0, 0, 1));
 
 	//Detection
@@ -52,24 +49,23 @@ m_currentAnimationState(ENEMY_IDLE_DOWN)
 	setDetectionColour(glm::vec4(1, 0, 0, 1));
 
 	// Create the tree.
-	m_pTree = new DecisionTree(this); // this is a pointer to the Ship object
+	m_pTree = new DecisionTree(this); // this is a pointer to the Enemy object
 	// m_pTree->setAgent(this);
 	//m_pTree->Display(); // Optional.
 	m_patrol.reserve(m_patrol.size());
 
 }
 
-Ship::~Ship()
+Enemy::~Enemy()
 = default;
 
-void Ship::draw()
+void Enemy::draw()
 {
 	// alias for x and y
 	const auto x = getTransform()->position.x;
 	const auto y = getTransform()->position.y;
 
-	// draw the ship
-	//TextureManager::Instance().draw("ship", x, y, getCurrentHeading(), 255, true);
+	// draw the Enemy Animations
 
 	switch (m_currentAnimationState)
 	{
@@ -98,6 +94,10 @@ void Ship::draw()
 			x, y, 0.1f, 0, 255, true);
 		break;
 	}
+
+	// draw Collision Ray
+	Util::DrawCircle(getTransform()->position,  getCOLDistance(), getCOLColour());
+
 	// draw LOS
 	Util::DrawLine(getTransform()->position, getTransform()->position + getCurrentDirection() * getLOSDistance(), getLOSColour());
 
@@ -110,12 +110,12 @@ void Ship::draw()
 }
 
 
-void Ship::update()
+void Enemy::update()
 {
 	float angle_to_target;
 	angle_to_target = Util::angle(getTransform()->position, m_pTarget->getTransform()->position);
 
-	std::cout << angle_to_target << std::endl;
+	//std::cout << angle_to_target << std::endl;
 	if (angle_to_target >=0 && angle_to_target <=45)
 		setAnimationState(ENEMY_WALK_RIGHT);
 	if (angle_to_target > 45 && angle_to_target <= 135)
@@ -128,9 +128,9 @@ void Ship::update()
 		getTree()->MakeDecision(); // Check for an new potential action
 }
 
-void Ship::clean(){}
+void Enemy::clean(){}
 
-void Ship::turnRight()
+void Enemy::turnRight()
 {
 	setCurrentHeading(getCurrentHeading() + m_turnRate);
 	if (getCurrentHeading() >= 360)
@@ -139,7 +139,7 @@ void Ship::turnRight()
 	}
 }
 
-void Ship::turnLeft()
+void Enemy::turnLeft()
 {
 	setCurrentHeading(getCurrentHeading() - m_turnRate);
 	if (getCurrentHeading() < 0)
@@ -148,18 +148,18 @@ void Ship::turnLeft()
 	}
 }
 
-void Ship::moveForward()
+void Enemy::moveForward()
 {
 	getTransform()->position += getCurrentDirection() * m_maxSpeed;
 	//getRigidBody()->velocity = getCurrentDirection() * m_maxSpeed;
 }
 
-void Ship::moveBack()
+void Enemy::moveBack()
 {
 	//getRigidBody()->velocity = getCurrentDirection() * -m_maxSpeed;
 }
 
-void Ship::move()
+void Enemy::move()
 {
 	rotate();
 	moveForward();
@@ -167,16 +167,16 @@ void Ship::move()
 	getRigidBody()->velocity *= 0.9f;*/
 }
 
-void Ship::wait()
+void Enemy::wait()
 {
 	setAnimationState(ENEMY_IDLE_DOWN);
 	
 }
 
-void Ship::rotate()
+void Enemy::rotate()
 {
 	// Step 1: Find angle between two points
-	// Util::angle(getTransform()->position, m_pTarget->getTransform()->position)
+	// Util::angle(getTransform()->position, m_pPlayer->getTransform()->position)
 
 	// Step 2: Plug angle into a lerp
 	// Util::lerpAngle(getCurrentHeading(), <destination angle>, 0.1f)
@@ -188,74 +188,74 @@ void Ship::rotate()
 		Util::angle(getTransform()->position, m_pTarget->getTransform()->position), 0.1f));
 }
 
-void Ship::rotateToTarget(DisplayObject* target)
+void Enemy::rotateToTarget(DisplayObject* target)
 {
 	setCurrentHeading(Util::lerpAngle(getCurrentHeading(), Util::angle(getTransform()->position, target->getTransform()->position), 0.25f));
 }
 
 
-float Ship::getMaxSpeed() const
+float Enemy::getMaxSpeed() const
 {
 	return m_maxSpeed;
 }
 
-int Ship::getHealth() const
+int Enemy::getHealth() const
 {
 	return m_health;
 }
 
-void Ship::setHealth(int newHealth)
+void Enemy::setHealth(int newHealth)
 {
 	m_health = newHealth;
 }
 
-DisplayObject* Ship::getTarget()
+DisplayObject* Enemy::getTarget()
 {
 	return m_pTarget;
 }
 
-std::vector<DisplayObject*>& Ship::getPatrol()
+std::vector<DisplayObject*>& Enemy::getPatrol()
 {
 	return m_patrol;
 }
 
-DecisionTree* Ship::getTree()
+DecisionTree* Enemy::getTree()
 {
 	return m_pTree;
 }
 
-void Ship::setMaxSpeed(float newSpeed)
+void Enemy::setMaxSpeed(float newSpeed)
 {
 	m_maxSpeed = newSpeed;
 }
 
-void Ship::setTarget(DisplayObject* target)
+void Enemy::setTarget(DisplayObject* target)
 {
 	m_pTarget = target;
 }
 
-void Ship::setClosestLOSNode(PathNode* node)
+void Enemy::setClosestLOSNode(PathNode* node)
 {
 	m_pLOSNode = node;
 }
 
-DisplayObject* Ship::getCurrentWaypoint()
+DisplayObject* Enemy::getCurrentWaypoint()
 {
 	return m_patrol[m_waypoint];
 }
 
-void Ship::resumePatrol()
+void Enemy::resumePatrol()
 {
 	setTarget(m_patrol[m_waypoint]); // m_waypoint is current PathNode to go to
 	m_state = ActionState::PATROL;
 }
 
-void Ship::setAnimationState(EnemyAnimationStates new_state)
+void Enemy::setAnimationState(EnemyAnimationStates new_state)
 {
 	m_currentAnimationState = new_state;
 }
 
-void Ship::m_buildAnimations()
+void Enemy::m_buildAnimations()
 {
 	Animation walkUpAnimation = Animation();
 	walkUpAnimation.name = "walkUp";
@@ -305,7 +305,7 @@ void Ship::m_buildAnimations()
 	setAnimation(attackUpAnimation);
 }
 
-DisplayObject* Ship::getNextWaypoint()
+DisplayObject* Enemy::getNextWaypoint()
 {
 	m_waypoint++;
 	if (m_waypoint == m_patrol.size()) m_waypoint = 0;
@@ -313,12 +313,12 @@ DisplayObject* Ship::getNextWaypoint()
 	return m_pTarget;
 }
 
-PathNode* Ship::getClosestLOSNode()
+PathNode* Enemy::getClosestLOSNode()
 {
 	return m_pLOSNode;
 }
 
-void Ship::m_checkBounds()
+void Enemy::m_checkBounds()
 {
 
 	if (getTransform()->position.x > Config::SCREEN_WIDTH)
@@ -343,7 +343,7 @@ void Ship::m_checkBounds()
 
 }
 
-void Ship::m_reset()
+void Enemy::m_reset()
 {
 	getRigidBody()->isColliding = false;
 	const int halfWidth = getWidth() * 0.5f;

@@ -10,11 +10,11 @@
 #include "EnemyAnimationStates.h"
 #include "Sprite.h"
 
-class Ship final : public Sprite
+class Enemy final : public Sprite
 {
 public:
-	Ship();
-	~Ship();
+	Enemy();
+	~Enemy();
 
 	// Inherited via GameObject
 	void draw() override;

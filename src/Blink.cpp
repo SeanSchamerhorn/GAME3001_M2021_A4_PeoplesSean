@@ -105,14 +105,14 @@ void Blink::update()
 			SoundManager::Instance().playSound("footsteps", 0);
 			is_playing = true;
 		}
-			moveForward();
+		moveForward();
 	}
-	if(EventManager::Instance().isKeyDown(SDL_SCANCODE_A))
+	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_A))
 	{
 		setAnimationState(BLINK_RUN_LEFT);
 		turnLeft();
 	}
-	if(EventManager::Instance().isKeyDown(SDL_SCANCODE_D))
+	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_D))
 	{
 		setAnimationState(BLINK_RUN_RIGHT);
 		turnRight();
@@ -121,11 +121,11 @@ void Blink::update()
 	{
 		moveBack();
 	}
-	if(EventManager::Instance().getMouseButton(RIGHT))
+	if (EventManager::Instance().getMouseButton(RIGHT))
 	{
 		setAnimationState(BLINK_CLOSE_ATTACK);
 	}
-	
+
 }
 
 void Blink::clean()
@@ -170,7 +170,7 @@ void Blink::rotate()
 {
 
 	// Step 1: Find angle between two points
-	// Util::angle(getTransform()->position, m_pTarget->getTransform()->position)
+	// Util::angle(getTransform()->position, m_pPlayer->getTransform()->position)
 
 	// Step 2: Plug angle into a lerp
 	// Util::lerpAngle(getCurrentHeading(), <destination angle>, 0.1f)

@@ -8,7 +8,7 @@
 #include "EnemyBullet.h"
 #include "Label.h"
 #include "Obstacle.h"
-#include "ship.h"
+#include "Enemy.h"
 #include "PathNode.h"
 #include "Target.h"
 
@@ -34,8 +34,8 @@ private:
 	bool m_isGridEnabled;
 
 	// Game Objects
-	Blink* m_pTarget;
-	Ship* m_pShip;
+	Blink* m_pPlayer;
+	Enemy* m_pEnemy;
 
 	std::vector<EnemyBullet*> m_pEbullets;
 
@@ -56,10 +56,15 @@ private:
 	// Detection
 	void m_CheckDetection(DisplayObject* target_object);
 
+	// Collision
+	bool m_CheckCollision(DisplayObject* target);
+	
 	// UI functions
 	void m_toggleGrid(bool state);
 
 
+	// Check Collision
+	
 	// convenience functions
 	PathNode* m_getTile(int col, int row);
 	PathNode* m_getTile(glm::vec2 grid_position);

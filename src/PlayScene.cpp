@@ -32,25 +32,31 @@ void PlayScene::draw()
 void PlayScene::update()
 {
 	m_mousePosition = EventManager::Instance().getMousePosition();
-	//m_pTarget->setTargetPosition(m_mousePosition);
+	float angle_to_target;
+	angle_to_target = Util::angle(m_pPlayer->getTransform()->position, m_mousePosition);
 	
 	// Set three conditions of decision tree here.
-	m_pShip->getTree()->getLOSNode()->setLOS(m_pShip->hasLOS()); // Or use m_pShip if you want to be lazy/wrong.
+	m_pEnemy->getTree()->getLOSNode()->setLOS(m_pEnemy->hasLOS()); // Or use m_pEnemy if you want to be lazy/wrong.
 
-	m_pShip->getTree()->getRadiusNode()->setIsWithinRadius(
-		Util::distance(m_pShip->getTransform()->position, m_pTarget->getTransform()->position) <= m_pShip->getDetectionDistance());
+	m_pEnemy->getTree()->getRadiusNode()->setIsWithinRadius(
+		Util::distance(m_pEnemy->getTransform()->position, m_pPlayer->getTransform()->position) <= m_pEnemy->getDetectionDistance());
 
-	m_pShip->getTree()->getCloseCombatNode()->setIsWithinCombatRange(
-		Util::distance(m_pShip->getTransform()->position, m_pTarget->getTransform()->position) <= 60.0f);
+	m_pEnemy->getTree()->getCloseCombatNode()->setIsWithinCombatRange(
+		Util::distance(m_pEnemy->getTransform()->position, m_pPlayer->getTransform()->position) <= 60.0f);
 
 	updateDisplayList();
 	
-	m_CheckAgentLOS(m_pShip, m_pTarget);
-	m_CheckPathNodeLOS(m_pTarget);
+	m_CheckAgentLOS(m_pEnemy, m_pPlayer);
+	m_CheckPathNodeLOS(m_pPlayer);
 
-	m_findClosestPathNode(m_pShip, m_pTarget); // With LOS 
+	m_findClosestPathNode(m_pEnemy, m_pPlayer); // With LOS 
 
-	m_CheckDetection(m_pTarget);
+	m_CheckDetection(m_pPlayer);
+
+	if(m_CheckCollision(m_pObstacle1))
+	{
+		m_pEnemy->setCurrentHeading(m_pEnemy->getCurrentHeading() + 4.0f);
+	}
 
 	// Color the patrol nodes...
 	m_pGrid[81]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -58,11 +64,13 @@ void PlayScene::update()
 	//m_pGrid[208]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	//m_pGrid[104]->setLOSColour(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-	//if (m_pShip->hasLOS())
+	//m_pPlayer->setCurrentHeading(angle_to_target);
+	
+	//if (m_pEnemy->hasLOS())
 	//{
 	//	EnemyBullet* bill = new EnemyBullet();
-	//	bill->getTransform()->position = m_pShip->getTransform()->position;
-	//	bill->setCurrentDirection(m_pShip->getCurrentDirection());
+	//	bill->getTransform()->position = m_pEnemy->getTransform()->position;
+	//	bill->setCurrentDirection(m_pEnemy->getCurrentDirection());
 	//	addChild(bill);
 	//	m_pEbullets.push_back(bill);
 	//}
@@ -85,10 +93,16 @@ void PlayScene::handleEvents()
 	if (EventManager::Instance().getMouseButton(LEFT))
 	{
 		m_mousePosition = EventManager::Instance().getMousePosition();
+		float angle_to_target;
+		angle_to_target = Util::angle(m_pPlayer->getTransform()->position, m_mousePosition);
+		std::cout << "Bullet Direction ("<< m_mousePosition.x<<", "<<m_mousePosition.y<<")" << std::endl;
 		EnemyBullet* will = new EnemyBullet();
-		will->getTransform()->position = m_pTarget->getTransform()->position;
-		will->setCurrentDirection(m_pTarget->getCurrentDirection());
+		will->getTransform()->position = m_pPlayer->getTransform()->position;
+		//will->setCurrentDirection(m_pPlayer->getCurrentDirection());
+		will->setCurrentHeading(angle_to_target);
+		SoundManager::Instance().setSoundVolume(5);
 		SoundManager::Instance().playSound("flame", 0);
+		std::cout << "BULLET DIRECTION (" <<will->getCurrentDirection().x << ", "<< will->getCurrentDirection().y<<")" << std::endl;
 		addChild(will);
 		m_pEbullets.push_back(will);
 	}
@@ -103,7 +117,7 @@ void PlayScene::start()
 	SoundManager::Instance().allocateChannels(128);
 	SoundManager::Instance().load("../Assets/audio/walking.wav", "footsteps", SOUND_SFX);
 	SoundManager::Instance().setSoundVolume(20);
-	SoundManager::Instance().load("../Assets/audio/flamethrower.ogg", "flame", SOUND_SFX);
+	SoundManager::Instance().load("../Assets/audio/flame.ogg", "flame", SOUND_SFX);
 	SoundManager::Instance().load("../Assets/audio/enemy_strike.ogg", "strike", SOUND_SFX);
 
 	SoundManager::Instance().load("../Assets/audio/forest_main.ogg", "forest", SOUND_MUSIC);
@@ -117,32 +131,23 @@ void PlayScene::start()
 	m_buildGrid();
 
 	// add the enemy to the scene as a start point
-	m_pShip = new Ship();
-	m_pShip->getTransform()->position = m_pGrid[81]->getTransform()->position;
-	addChild(m_pShip, 3);
+	m_pEnemy = new Enemy();
+	m_pEnemy->getTransform()->position = m_pGrid[81]->getTransform()->position;
+	addChild(m_pEnemy, 3);
 
 	// Set the ship's patrol route.
-	m_pShip->getPatrol().push_back(m_pGrid[81]);
-	m_pShip->getPatrol().push_back(m_pGrid[88]);
-	//m_pShip->getPatrol().push_back(m_pGrid[208]);
-	//m_pShip->getPatrol().push_back(m_pGrid[104]);
-	m_pShip->setTarget(m_pShip->getPatrol().front());
+	m_pEnemy->getPatrol().push_back(m_pGrid[81]);
+	m_pEnemy->getPatrol().push_back(m_pGrid[88]);
+	//m_pEnemy->getPatrol().push_back(m_pGrid[208]);
+	//m_pEnemy->getPatrol().push_back(m_pGrid[104]);
+	m_pEnemy->setTarget(m_pEnemy->getPatrol().front());
 
 
-	//// add the Obstacle to the scene as a start point
-	//m_pObstacle1 = new Obstacle();
-	//m_pObstacle1->getTransform()->position = glm::vec2(380.f, 280.f);
-	//addChild(m_pObstacle1);
+	// add the Obstacle to the scene as a start point
+	m_pObstacle1 = new Obstacle();
+	m_pObstacle1->getTransform()->position = m_pGrid[85]->getTransform()->position;
+	addChild(m_pObstacle1);
 
-	//// add the Obstacle to the scene as a start point
-	//m_pObstacle2 = new Obstacle();
-	//m_pObstacle2->getTransform()->position = glm::vec2(380.f, 80.f);
-	//addChild(m_pObstacle2);
-
-	//// add the Obstacle to the scene as a start point
-	//m_pObstacle3 = new Obstacle();
-	//m_pObstacle3->getTransform()->position = glm::vec2(380.f, 480.f);
-	//addChild(m_pObstacle3);
 	for (int i = 0; i < 6; i++)
 	{
 		Obstacle* obs = new Obstacle();
@@ -153,25 +158,20 @@ void PlayScene::start()
 	}
 
 	// add Blink to the scene
-	
-
-	// add the target to the scene a goal
-	m_pTarget = new Blink();
-	m_pTarget->getTransform()->position = glm::vec2(700.f, 300.f);
-	addChild(m_pTarget);
+	m_pPlayer = new Blink();
+	m_pPlayer->getTransform()->position = glm::vec2(700.f, 300.f);
+	addChild(m_pPlayer);
 
 	// Set some data onto the ship's decision tree's map. I only have the player/target for now.
-	m_pShip->getTree()->setPlayer(m_pTarget);
-	m_pShip->getTree()->getMap().emplace("target", m_pTarget);
-	m_pShip->getTree()->MakeDecision(); // Or we won't go into patrol
+	m_pEnemy->getTree()->setPlayer(m_pPlayer);
+	m_pEnemy->getTree()->getMap().emplace("target", m_pPlayer);
+	m_pEnemy->getTree()->MakeDecision(); // Or we won't go into patrol
 	
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
 
 void PlayScene::GUI_Function()
 {
-	// TODO:
-	// Toggle Visibility for the StarShip and the Target
 		
 	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
 	
@@ -193,34 +193,26 @@ void PlayScene::GUI_Function()
 
 	// allow ship rotation
 	static int angle;
-	angle = m_pShip->getCurrentHeading(); // New.
-	if (ImGui::SliderInt("Ship Direction", &angle, -360, 360))
+	angle = m_pEnemy->getCurrentHeading(); // New.
+	if (ImGui::SliderInt("Enemy Direction", &angle, -360, 360))
 	{
-		m_pShip->setCurrentHeading(angle);
+		m_pEnemy->setCurrentHeading(angle);
 	}
 
 	ImGui::Separator();
 
-	static int shipPosition[] = { m_pShip->getTransform()->position.x, m_pShip->getTransform()->position.y };
-	if (ImGui::SliderInt2("Ship Position", shipPosition, 0, 800))
+	static int shipPosition[] = { m_pEnemy->getTransform()->position.x, m_pEnemy->getTransform()->position.y };
+	if (ImGui::SliderInt2("Enemy Position", shipPosition, 0, 800))
 	{
-		m_pShip->getTransform()->position.x = shipPosition[0];
-		m_pShip->getTransform()->position.y = shipPosition[1];
-
-		/*std::cout << "------------------------" << std::endl;
-		std::cout << m_pShip->getTree()->MakeDecision() << std::endl;
-		std::cout << "------------------------\n" << std::endl;*/
+		m_pEnemy->getTransform()->position.x = shipPosition[0];
+		m_pEnemy->getTransform()->position.y = shipPosition[1];
 	}
 
-	static int targetPosition[] = { m_pTarget->getTransform()->position.x, m_pTarget->getTransform()->position.y };
+	static int targetPosition[] = { m_pPlayer->getTransform()->position.x, m_pPlayer->getTransform()->position.y };
 	if (ImGui::SliderInt2("Target Position", targetPosition, 0, 800))
 	{
-		m_pTarget->getTransform()->position.x = targetPosition[0];
-		m_pTarget->getTransform()->position.y = targetPosition[1];
-
-		/*std::cout << "------------------------" << std::endl;
-		std::cout << m_pShip->getTree()->MakeDecision() << std::endl;
-		std::cout << "------------------------\n" << std::endl;*/
+		m_pPlayer->getTransform()->position.x = targetPosition[0];
+		m_pPlayer->getTransform()->position.y = targetPosition[1];
 	}
 
 	ImGui::Separator();
@@ -293,6 +285,8 @@ bool PlayScene::m_CheckAgentLOS(Agent* agent, DisplayObject* target)
 	return hasLOS;
 }
 
+
+
 void PlayScene::m_CheckPathNodeLOS(DisplayObject* target)
 {
 	for (auto path_node : m_pGrid)
@@ -319,17 +313,33 @@ PathNode* PlayScene::m_findClosestPathNode(Agent* agent, DisplayObject* target)
 		}
 	}
 	closestPathNode->setLOSColour(glm::vec4(0.0f,0.0f,1.0f,1.0f));
-	m_pShip->setClosestLOSNode(closestPathNode);
+	m_pEnemy->setClosestLOSNode(closestPathNode);
 	return closestPathNode;
 }
 
 void PlayScene::m_CheckDetection(DisplayObject* target_object)
 {
-	m_pShip->setHasDetection(false);
-	auto EnemyToTargetDistance = Util::distance(m_pShip->getTransform()->position, target_object->getTransform()->position);
-	if (EnemyToTargetDistance <= m_pShip->getDetectionDistance())
+	m_pEnemy->setHasDetection(false);
+	auto EnemyToTargetDistance = Util::distance(m_pEnemy->getTransform()->position, target_object->getTransform()->position);
+	if (EnemyToTargetDistance <= m_pEnemy->getDetectionDistance())
 	{
-		m_pShip->setHasDetection(true);
+		m_pEnemy->setHasDetection(true);
 	}
 	
 }
+
+bool PlayScene::m_CheckCollision(DisplayObject* target)
+{
+	bool hasCOL = false;
+	m_pEnemy->setHasCOL(hasCOL);
+	auto EnemyToTargetDistance = Util::distance(m_pEnemy->getTransform()->position, target->getTransform()->position);
+	if (EnemyToTargetDistance <= m_pEnemy->getCOLDistance())
+	{
+		hasCOL = true;
+		m_pEnemy->setHasCOL(hasCOL);
+	}
+	return hasCOL;
+}
+
+
+

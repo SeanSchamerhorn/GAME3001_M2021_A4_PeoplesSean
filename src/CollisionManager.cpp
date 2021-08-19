@@ -275,7 +275,7 @@ int CollisionManager::minSquaredDistanceLineLine(glm::vec2 line1_start, glm::vec
 	return norm;
 }
 
-bool CollisionManager::lineAABBCheck(Ship* object1, GameObject* object2)
+bool CollisionManager::lineAABBCheck(Enemy* object1, GameObject* object2)
 {
 	const auto lineStart = object1->getTransform()->position;
 	const auto lineEnd = object1->getTransform()->position + object1->getCurrentDirection() * 100.0f;

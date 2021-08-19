@@ -6,23 +6,23 @@
 #include "Blink.h"
 #include "Util.h"
 
-#include "ship.h" // New
+#include "Enemy.h" // New
 
 // Interface
 class ActionNode : public TreeNode
 {
 protected: // New.
-	Ship* m_pShip;
+	Enemy* m_pEnemy;
 	DisplayObject* m_pTarget;
 
 	Blink* m_pPlayer;
 
 public:
-	ActionNode(): m_pShip(nullptr), m_pTarget(nullptr), m_pPlayer(nullptr) { isLeaf = true; }
+	ActionNode(): m_pEnemy(nullptr), m_pTarget(nullptr), m_pPlayer(nullptr) { isLeaf = true; }
 	virtual ~ActionNode() = default;
 	virtual void Action() = 0;
 
-	void SetShip(Ship* ship) { m_pShip = ship; }
+	void SetShip(Enemy* ship) { m_pEnemy = ship; }
 	void SetTarget(DisplayObject* t) { m_pTarget = t; }
 
 	void SetPlayer(Blink* p) { m_pPlayer = p; }

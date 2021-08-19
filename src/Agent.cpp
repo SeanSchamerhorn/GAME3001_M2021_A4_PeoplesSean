@@ -29,6 +29,27 @@ float Agent::getDetectionDistance() const
 	return m_DetectionDistance;
 }
 
+float Agent::getCOLDistance() const
+{
+	return m_COLDistance;
+}
+
+bool Agent::hasCOL() const
+{
+	return m_hasCOL;
+}
+
+void Agent::setCOLDistance(float distance)
+{
+	m_COLDistance = distance;
+}
+
+void Agent::setHasCOL(bool state)
+{
+	m_hasCOL = state;
+	m_CollisionColour = (m_hasCOL) ? glm::vec4(0, 1, 0, 1) : glm::vec4(1, 0, 0, 1);
+}
+
 bool Agent::hasDetection() const
 {
 	return m_hasDetection;
@@ -37,6 +58,11 @@ bool Agent::hasDetection() const
 glm::vec4 Agent::getDetectionColour() const
 {
 	return m_DetectionColour;
+}
+
+glm::vec4 Agent::getCOLColour() const
+{
+	return m_CollisionColour;
 }
 
 void Agent::setDetectionDistance(float distance)
@@ -54,6 +80,11 @@ void Agent::setHasDetection(bool state)
 void Agent::setDetectionColour(glm::vec4 colour)
 {
 	m_DetectionColour = colour;
+}
+
+void Agent::setCOLColour(glm::vec4 colour)
+{
+	m_CollisionColour = colour;
 }
 
 bool Agent::hasLOS() const

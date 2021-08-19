@@ -12,11 +12,11 @@ MoveToPlayerAction::~MoveToPlayerAction()
 void MoveToPlayerAction::Action()
 {
 	std::cout << "Performing Move To Player Action" << std::endl;
-	if (m_pShip->m_state != ActionState::MOVE_TO_PLAYER) // "enter/init"
+	if (m_pEnemy->m_state != ActionState::MOVE_TO_PLAYER) // "enter/init"
 	{
-		m_pTarget = m_pShip->getTree()->getMap()["target"]; // Again just target/player in map.
-		m_pShip->setTarget(m_pTarget);
-		m_pShip->m_state = ActionState::MOVE_TO_PLAYER;
+		m_pTarget = m_pEnemy->getTree()->getMap()["target"]; // Again just target/player in map.
+		m_pEnemy->setTarget(m_pTarget);
+		m_pEnemy->m_state = ActionState::MOVE_TO_PLAYER;
 	}
-	m_pShip->move();
+	m_pEnemy->move();
 }
